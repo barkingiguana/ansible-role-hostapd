@@ -1,0 +1,8 @@
+---
+hostapd_interface_name: wlan0
+hostapd_interface_address: 2001:db8::1
+hostapd_interface_netmask: 32
+hostapd_channel: 6
+hostapd_network_ssid: Change My SSID
+hostapd_network_passphrase: changeme
+hostapd_manage_service: yes

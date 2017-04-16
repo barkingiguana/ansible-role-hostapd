@@ -1,0 +1,23 @@
+---
+- name: restart interface
+  become: yes
+  shell: "ifdown {{ hostapd_interface_name }}; ifup {{ hostapd_interface_name }}"
+  when:
+   - "{{ hostapd_manage_service }}"
+
+- name: restart dhcpcd
+  become: yes
+  service:
+    name: dhcpcd
+    state: restarted
+  when:
+    - "{{ hostapd_manage_service }}"
+
+- name: restart hostapd
+  become: yes
+  service:
+    name: hostapd
+    state: restarted
+  when:
+    - "{{ not hostapd_started | changed }}"
+    - "{{ hostapd_manage_service }}"

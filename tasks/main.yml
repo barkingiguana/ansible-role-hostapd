@@ -1,0 +1,52 @@
+---
+- name: Disable dhcpcd for the interface
+  become: yes
+  lineinfile:
+    dest: /etc/dhcpcd.conf
+    line: 'denyinterfaces {{ hostapd_interface_name }}'
+  notify:
+    - restart dhcpcd
+
+- name: Configure the interface
+  become: yes
+  template:
+    dest: "/etc/network/interfaces.d/{{ hostapd_interface_name }}"
+    src: templates/interface.j2
+  notify:
+    - restart interface
+
+- name: Install hostapd
+  become: yes
+  package:
+    name: hostapd
+
+- name: Configure hostapd
+  become: yes
+  template:
+    dest: /etc/hostapd/hostapd.conf
+    src: templates/hostapd.conf.j2
+  notify:
+    - restart hostapd
+
+- name: Point to hostapd.conf
+  become: yes
+  copy:
+    dest: /etc/default/hostapd
+    src: etc-default-hostapd
+  notify:
+    - restart hostapd
+
+- name: Enable hostapd
+  become: yes
+  service:
+    name: hostapd
+    enabled: yes
+
+- name: Start hostapd
+  become: yes
+  service:
+    name: hostapd
+    state: started
+  register: hostapd_started
+  when:
+    - "{{ hostapd_manage_service }}"
